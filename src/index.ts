@@ -19,7 +19,7 @@ type User = {
 }
 
 const user: User = {
-    id: "smth",
+    id: "some id",
     username: "Jamshid",
     age: 25,
     hobbies: ['Coding', 'Football', 'Reading']
@@ -48,6 +48,8 @@ const httpServer = http.createServer((req: http.IncomingMessage, res: http.Serve
     }
 
 });
+
+console.log("Code is here")
 
 // const httpServer = createServer();
 //
