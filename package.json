@@ -2,19 +2,22 @@
   "name": "simple_crud_api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.ts",
   "type": "module",
   "scripts": {
     "lint": "eslint .",
-    "dev": "nodemon",
-    "build": "tsc index.ts",
-    "start": "ts-node index.ts"
+    "start:dev": "cross-env NODE_ENV=development nodemon index.ts",
+    "start": "node dev/index.js",
+    "build": "tsc -p tsconfig.prod.json",
+    "start:prod": "cross-env NODE_ENV=production npm run build && node build/index.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^18.16.3",
+    "@types/uuid": "^9.0.1",
     "@typescript-eslint/eslint-plugin": "^5.59.2",
+    "cross-env": "^7.0.3",
     "eslint": "^8.39.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-config-standard-with-typescript": "^34.0.1",
@@ -27,7 +30,6 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@types/uuid": "^9.0.1",
     "dotenv": "^16.0.3",
     "uuid": "^9.0.0"
   }

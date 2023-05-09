@@ -2,7 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "rootDir": "./src",
-    "outDir": "./build",
+    "outDir": "./dev",
     "noEmit": false,
     "target": "ES6",
     "module": "ES6",
