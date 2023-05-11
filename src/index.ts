@@ -23,13 +23,12 @@ const allUsers: User[] = [];
 const user1: User = { id: uuidv4(), username: "Jamshid", age: 25, hobbies: ['Coding', 'Football', 'Reading'] }
 const user2: User = { id: uuidv4(), username: "Franchesko", age: 34, hobbies: ['Public speaking', 'Arts', 'Netflix'] }
 const user3: User = { id: uuidv4(), username: "Diana", age: 26, hobbies: ["Coding", "swimming"] };
-const user4: User = { id: uuidv4(), username: "Kostya", age: 18, hobbies: ["Design", "BTS"] };
+const user4: User = { id: uuidv4(), username: "Kolumb", age: 18, hobbies: ["Design", "BTS"] };
 const user5: User = { id: uuidv4(), username: "Vladimir", age: 25, hobbies: ['Reading', 'Tennis'] }
-const user6: User = { id: uuidv4(), username: "Leo", age: 35, hobbies: ["Football", "Business"] };
-const user7: User = { id: uuidv4(), username: "Leos", age: 35, hobbies: ["Football", "Business"] };
-const user8: User = { id: uuidv4(), username: "Leoy", age: 35, hobbies: ["Football", "Business"] };
+const user6: User = { id: uuidv4(), username: "Antonio", age: 35, hobbies: ["Football", "Business"] };
 
-allUsers.push(user1, user2, user3, user4, user5, user6, user7, user8);
+
+allUsers.push(user1, user2, user3, user4, user5, user6);
 
 const port: number = process.env.NODE_ENV === 'production' ? parseInt(process.env.PROD_PORT as string) : parseInt(process.env.DEV_PORT as string);
 
