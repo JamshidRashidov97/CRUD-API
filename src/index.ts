@@ -26,9 +26,10 @@ const user3: User = { id: uuidv4(), username: "Diana", age: 26, hobbies: ["Codin
 const user4: User = { id: uuidv4(), username: "Kostya", age: 18, hobbies: ["Design", "BTS"] };
 const user5: User = { id: uuidv4(), username: "Vladimir", age: 25, hobbies: ['Reading', 'Tennis'] }
 const user6: User = { id: uuidv4(), username: "Leo", age: 35, hobbies: ["Football", "Business"] };
+const user7: User = { id: uuidv4(), username: "Leos", age: 35, hobbies: ["Football", "Business"] };
+const user8: User = { id: uuidv4(), username: "Leoy", age: 35, hobbies: ["Football", "Business"] };
 
-
-allUsers.push(user1, user2, user3, user4, user5, user6);
+allUsers.push(user1, user2, user3, user4, user5, user6, user7, user8);
 
 const port: number = process.env.NODE_ENV === 'production' ? parseInt(process.env.PROD_PORT as string) : parseInt(process.env.DEV_PORT as string);
 
@@ -38,7 +39,7 @@ const httpServer = http.createServer(async (req: http.IncomingMessage, res: http
     const path = reqUrl.pathname;
     const query = reqUrl.searchParams;
 
-    if (req.url === "/api/users" && req.method === 'GET') {
+    if (req.method === 'GET' && req.url === "/api/users") {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.write(JSON.stringify(allUsers));
         res.end();
@@ -61,6 +62,91 @@ const httpServer = http.createServer(async (req: http.IncomingMessage, res: http
                 res.end();
             }
         }
+    }
+    else if (req.method === 'POST' && req.url === "/api/users"){
+
+        let body = '';
+
+        req.on('data', (chunk) => {
+            body += chunk.toString();
+        });
+
+        req.on('end', () => {
+            try {
+                const { username, age, hobbies }: User = JSON.parse(body);
+                if ( !username || !age || !hobbies) {
+                    res.statusCode = 400;
+                    res.end('Missing required fields');
+                } else {
+                    const newUser: User = { id: uuidv4(), username, age, hobbies };
+                    allUsers.push(newUser);
+                    res.statusCode = 201;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.end(JSON.stringify(newUser));
+                }
+            } catch (error) {
+                res.statusCode = 400;
+                res.end('Wrong request body');
+            }
+        });
+    }
+    else if (req.method === 'PUT' && path.startsWith('/api/users/')) {
+        const userId = path.slice(11);
+
+        let body = '';
+
+        req.on('data', (chunk) => {
+            body += chunk.toString();
+        });
+
+        req.on('end', () => {
+            try {
+                const { username, age, hobbies }: User = JSON.parse(body);
+                if (!validate(userId)) {
+                    res.writeHead(400, {'Content-Type': 'application/json'});
+                    res.write(JSON.stringify({error: 'User ID is not uuid'}));
+                    res.end();
+                } else {
+                    const index = allUsers.findIndex((user) => user.id === userId);
+                    if (!index) {
+                        res.writeHead(404, {'Content-Type': 'application/json'});
+                        res.write(JSON.stringify({error: 'User not found'}));
+                        res.end();
+                    } else {
+                        allUsers[index] = { ...allUsers[index], username, age, hobbies };
+                        res.statusCode = 200;
+                        res.setHeader('Content-Type', 'application/json');
+                        res.end(JSON.stringify(allUsers[index]));
+                    }
+                }
+            } catch (error) {
+                res.statusCode = 400;
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify({ message: 'Invalid request body' }));
+            }
+        });
+    }
+    else if (req.method === 'DELETE' && path.startsWith('/api/users/')) {
+        const userId = path.slice(11);
+
+        if (!validate(userId)) {
+            res.writeHead(400, {'Content-Type': 'application/json'});
+            res.write(JSON.stringify({error: 'User ID is not uuid'}));
+            res.end();
+            return;
+        }
+
+        const index = allUsers.findIndex((user) => user.id === userId);
+        if (!index) {
+            res.writeHead(404, {'Content-Type': 'application/json'});
+            res.write(JSON.stringify({error: 'User not found'}));
+            res.end();
+            return;
+        }
+
+        allUsers.splice(index, 1);
+        res.statusCode = 204;
+        res.end(JSON.stringify({ message: 'User deleted' }));
     }
     else {
         res.writeHead(404, { "Content-Type": "application/json" });
