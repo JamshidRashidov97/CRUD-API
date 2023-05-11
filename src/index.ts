@@ -38,118 +38,127 @@ const httpServer = http.createServer(async (req: http.IncomingMessage, res: http
     const path = reqUrl.pathname;
     const query = reqUrl.searchParams;
 
-    if (req.method === 'GET' && req.url === "/api/users") {
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.write(JSON.stringify(allUsers));
-        res.end();
-    }
-    else if (req.method === 'GET' && path.startsWith('/api/users/')) {
-        const userId = path.slice(11);
-        if (!validate(userId)) {
-            res.writeHead(400, {'Content-Type': 'application/json'});
-            res.write(JSON.stringify({error: 'User ID is not uuid'}));
+    try {
+
+        if (req.method === 'GET' && req.url === "/api/users") {
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.write(JSON.stringify(allUsers));
             res.end();
-        } else {
-            const user = allUsers.find((user) => user.id === userId);
-            if (!user) {
+        }
+        else if (req.method === 'GET' && path.startsWith('/api/users/')) {
+            const userId = path.slice(11);
+            if (!validate(userId)) {
+                res.writeHead(400, {'Content-Type': 'application/json'});
+                res.write(JSON.stringify({error: 'User ID is not uuid'}));
+                res.end();
+            } else {
+                const user = allUsers.find((user) => user.id === userId);
+                if (!user) {
+                    res.writeHead(404, {'Content-Type': 'application/json'});
+                    res.write(JSON.stringify({error: 'User not found'}));
+                    res.end();
+                } else {
+                    res.writeHead(200, {'Content-Type': 'application/json'});
+                    res.write(JSON.stringify(user));
+                    res.end();
+                }
+            }
+        }
+        else if (req.method === 'POST' && req.url === "/api/users"){
+
+            let body = '';
+
+            req.on('data', (chunk) => {
+                body += chunk.toString();
+            });
+
+            req.on('end', () => {
+                try {
+                    const { username, age, hobbies }: User = JSON.parse(body);
+                    if ( !username || !age || !hobbies) {
+                        res.statusCode = 400;
+                        res.end('Missing required fields');
+                    } else {
+                        const newUser: User = { id: uuidv4(), username, age, hobbies };
+                        allUsers.push(newUser);
+                        res.statusCode = 201;
+                        res.setHeader('Content-Type', 'application/json');
+                        res.end(JSON.stringify(newUser));
+                    }
+                } catch (error) {
+                    res.statusCode = 400;
+                    res.end('Wrong request body');
+                }
+            });
+        }
+        else if (req.method === 'PUT' && path.startsWith('/api/users/')) {
+            const userId = path.slice(11);
+
+            let body = '';
+
+            req.on('data', (chunk) => {
+                body += chunk.toString();
+            });
+
+            req.on('end', () => {
+                try {
+                    const { username, age, hobbies }: User = JSON.parse(body);
+                    if (!validate(userId)) {
+                        res.writeHead(400, {'Content-Type': 'application/json'});
+                        res.write(JSON.stringify({error: 'User ID is not uuid'}));
+                        res.end();
+                    } else {
+                        const index = allUsers.findIndex((user) => user.id === userId);
+                        if (index === -1) {
+                            res.writeHead(404, {'Content-Type': 'application/json'});
+                            res.write(JSON.stringify({error: 'User not found'}));
+                            res.end();
+                        } else {
+                            allUsers[index] = { ...allUsers[index], username, age, hobbies };
+                            res.statusCode = 200;
+                            res.setHeader('Content-Type', 'application/json');
+                            res.end(JSON.stringify(allUsers[index]));
+                        }
+                    }
+                } catch (error) {
+                    res.statusCode = 400;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.end(JSON.stringify({ message: 'Invalid request body' }));
+                }
+            });
+        }
+        else if (req.method === 'DELETE' && path.startsWith('/api/users/')) {
+            const userId = path.slice(11);
+
+            if (!validate(userId)) {
+                res.writeHead(400, {'Content-Type': 'application/json'});
+                res.write(JSON.stringify({error: 'User ID is not uuid'}));
+                res.end();
+                return;
+            }
+
+            const index = allUsers.findIndex((user) => user.id === userId);
+            if (index === -1) {
                 res.writeHead(404, {'Content-Type': 'application/json'});
                 res.write(JSON.stringify({error: 'User not found'}));
                 res.end();
-            } else {
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify(user));
-                res.end();
+                return;
             }
+
+            allUsers.splice(index, 1);
+            res.statusCode = 204;
+            res.end(JSON.stringify({ message: 'User deleted' }));
         }
-    }
-    else if (req.method === 'POST' && req.url === "/api/users"){
-
-        let body = '';
-
-        req.on('data', (chunk) => {
-            body += chunk.toString();
-        });
-
-        req.on('end', () => {
-            try {
-                const { username, age, hobbies }: User = JSON.parse(body);
-                if ( !username || !age || !hobbies) {
-                    res.statusCode = 400;
-                    res.end('Missing required fields');
-                } else {
-                    const newUser: User = { id: uuidv4(), username, age, hobbies };
-                    allUsers.push(newUser);
-                    res.statusCode = 201;
-                    res.setHeader('Content-Type', 'application/json');
-                    res.end(JSON.stringify(newUser));
-                }
-            } catch (error) {
-                res.statusCode = 400;
-                res.end('Wrong request body');
-            }
-        });
-    }
-    else if (req.method === 'PUT' && path.startsWith('/api/users/')) {
-        const userId = path.slice(11);
-
-        let body = '';
-
-        req.on('data', (chunk) => {
-            body += chunk.toString();
-        });
-
-        req.on('end', () => {
-            try {
-                const { username, age, hobbies }: User = JSON.parse(body);
-                if (!validate(userId)) {
-                    res.writeHead(400, {'Content-Type': 'application/json'});
-                    res.write(JSON.stringify({error: 'User ID is not uuid'}));
-                    res.end();
-                } else {
-                    const index = allUsers.findIndex((user) => user.id === userId);
-                    if (!index) {
-                        res.writeHead(404, {'Content-Type': 'application/json'});
-                        res.write(JSON.stringify({error: 'User not found'}));
-                        res.end();
-                    } else {
-                        allUsers[index] = { ...allUsers[index], username, age, hobbies };
-                        res.statusCode = 200;
-                        res.setHeader('Content-Type', 'application/json');
-                        res.end(JSON.stringify(allUsers[index]));
-                    }
-                }
-            } catch (error) {
-                res.statusCode = 400;
-                res.setHeader('Content-Type', 'application/json');
-                res.end(JSON.stringify({ message: 'Invalid request body' }));
-            }
-        });
-    }
-    else if (req.method === 'DELETE' && path.startsWith('/api/users/')) {
-        const userId = path.slice(11);
-
-        if (!validate(userId)) {
-            res.writeHead(400, {'Content-Type': 'application/json'});
-            res.write(JSON.stringify({error: 'User ID is not uuid'}));
-            res.end();
-            return;
+        else {
+            res.writeHead(404, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ message: "Resource not found" }));
         }
 
-        const index = allUsers.findIndex((user) => user.id === userId);
-        if (!index) {
-            res.writeHead(404, {'Content-Type': 'application/json'});
-            res.write(JSON.stringify({error: 'User not found'}));
-            res.end();
-            return;
-        }
-
-        allUsers.splice(index, 1);
-        res.statusCode = 204;
-        res.end(JSON.stringify({ message: 'User deleted' }));
-    }
-    else {
-        res.writeHead(404, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ message: "Resource not found" }));
+    } catch (error) {
+        console.error(error);
+        res.writeHead(500, { "Content-Type": "text/plain" });
+        res.write("Internal Server Error");
+        res.end();
     }
 
 });
