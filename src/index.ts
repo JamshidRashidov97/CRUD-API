@@ -1,12 +1,5 @@
 import * as http from 'http';
-import { createServer } from 'http';
-import path from "path";
-import url from 'url';
-import fs from 'fs';
-import querystring from 'querystring';
-import cluster from "node:cluster";
-import os from 'node:os';
-import {v4 as uuidv4, V4Options, validate} from 'uuid';
+import {v4 as uuidv4, validate} from 'uuid';
 import * as dotenv from 'dotenv';
 import process from "node:process";
 dotenv.config()
@@ -27,7 +20,6 @@ const user4: User = { id: uuidv4(), username: "Kolumb", age: 18, hobbies: ["Desi
 const user5: User = { id: uuidv4(), username: "Vladimir", age: 25, hobbies: ['Reading', 'Tennis'] }
 const user6: User = { id: uuidv4(), username: "Antonio", age: 35, hobbies: ["Football", "Business"] };
 
-
 allUsers.push(user1, user2, user3, user4, user5, user6);
 
 const port: number = process.env.NODE_ENV === 'production' ? parseInt(process.env.PROD_PORT as string) : parseInt(process.env.DEV_PORT as string);
@@ -36,7 +28,7 @@ const httpServer = http.createServer(async (req: http.IncomingMessage, res: http
 
     const reqUrl = new URL(req.url || '', `https://${req.headers.host}`);
     const path = reqUrl.pathname;
-    const query = reqUrl.searchParams;
+    // const query = reqUrl.searchParams;
 
     try {
 
@@ -166,3 +158,5 @@ const httpServer = http.createServer(async (req: http.IncomingMessage, res: http
 httpServer.listen(port, () => {
     console.log(`Server in ${process.env.NODE_ENV} mode, listening on :${port} port`);
 })
+
+module.exports = { httpServer }
