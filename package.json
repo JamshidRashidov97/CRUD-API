@@ -7,7 +7,6 @@
   "scripts": {
     "lint": "eslint .",
     "start:dev": "cross-env NODE_ENV=development nodemon index.ts",
-    "test": "mocha --require ts-node/register test/**/*.test.ts",
     "start": "node dev/index.js",
     "build": "tsc -p tsconfig.prod.json",
     "start:prod": "cross-env NODE_ENV=production npm run build && node build/index.js"

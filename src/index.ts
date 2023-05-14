@@ -28,7 +28,6 @@ const httpServer = http.createServer(async (req: http.IncomingMessage, res: http
 
     const reqUrl = new URL(req.url || '', `https://${req.headers.host}`);
     const path = reqUrl.pathname;
-    // const query = reqUrl.searchParams;
 
     try {
 
