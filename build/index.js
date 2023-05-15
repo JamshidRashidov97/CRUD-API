@@ -24,7 +24,6 @@ const port = process.env.NODE_ENV === 'production' ? parseInt(process.env.PROD_P
 const httpServer = http.createServer((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const reqUrl = new URL(req.url || '', `https://${req.headers.host}`);
     const path = reqUrl.pathname;
-    const query = reqUrl.searchParams;
     try {
         if (req.method === 'GET' && req.url === "/api/users") {
             res.writeHead(200, { "Content-Type": "application/json" });

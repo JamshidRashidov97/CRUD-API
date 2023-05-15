@@ -157,5 +157,3 @@ const httpServer = http.createServer(async (req: http.IncomingMessage, res: http
 httpServer.listen(port, () => {
     console.log(`Server in ${process.env.NODE_ENV} mode, listening on :${port} port`);
 })
-
-module.exports = { httpServer }
