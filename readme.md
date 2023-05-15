@@ -7,7 +7,7 @@ It uses HTTP methods to perform CRUD operations on an in-memory database.
 ## **Installation**
 
 
-1) Clone the repository: git clone https://github.com/JamshidRashidov97/CRUD-API.git
+1) Clone the repository: git clone -b development https://github.com/JamshidRashidov97/CRUD-API.git.
 2) Install the dependencies:
    - cd simple-crud-api
    - npm install
